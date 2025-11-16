@@ -7,12 +7,28 @@ import quizService from './services/quizService';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-const publicPath = process.env.NODE_ENV === 'production' 
-    ? path.join(__dirname, '../../public')  // When running from dist
-    : path.join(process.cwd(), 'public');   // When running from root
+const publicPath = process.env.VERCEL 
+    ? path.join(process.cwd(), 'public')
+    : process.env.NODE_ENV === 'production' 
+        ? path.join(__dirname, '../../public')
+        : path.join(process.cwd(), 'public');
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' https://vercel.live; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "img-src 'self' data: https:; " +
+        "connect-src 'self' https://vercel.live https://minna-quiz-quocanhnguyen402s-projects.vercel.app;"
+    );
+    next();
+});
+
 app.use(express.static(publicPath));
 
 
