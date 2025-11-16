@@ -24,23 +24,25 @@ class QuizService {
     public filterVocabulary(vocabulary: VocabularyItem[], filterType: string): VocabularyItem[] {
         const category = filterType.toLowerCase();
 
-        const hasCategoryField = vocabulary.some(item => item.category !== undefined);
+        const withCategory = vocabulary.filter(item => item.category === category);
+        const withoutCategory = vocabulary.filter(item => !item.category);
         
-        if (hasCategoryField) {
-
-            return vocabulary.filter(item => item.category === category);
+        let filteredWithoutCategory: VocabularyItem[] = [];
+        if (withoutCategory.length > 0) {
+            switch (category) {
+                case 'verb':
+                    filteredWithoutCategory = this.filterVerbs(withoutCategory);
+                    break;
+                case 'noun':
+                    filteredWithoutCategory = this.filterNouns(withoutCategory);
+                    break;
+                case 'adjective':
+                    filteredWithoutCategory = this.filterAdjectives(withoutCategory);
+                    break;
+            }
         }
-
-        switch (category) {
-            case 'verb':
-                return this.filterVerbs(vocabulary);
-            case 'noun':
-                return this.filterNouns(vocabulary);
-            case 'adjective':
-                return this.filterAdjectives(vocabulary);
-            default:
-                return vocabulary;
-        }
+        
+        return [...withCategory, ...filteredWithoutCategory];
     }
 
     private filterVerbs(vocabulary: VocabularyItem[]): VocabularyItem[] {

@@ -5,7 +5,6 @@ class VocabularySetup {
         this.selectedWords = new Set();
         this.apiBaseUrl = '/api';
         this.filterType = this.getFilterFromUrl();
-        this.allLessons = [];
         this.availableLessons = [];
 
 
@@ -20,47 +19,29 @@ class VocabularySetup {
     }
 
     async init() {
-        await this.loadAvailableLessons();
+        await this.loadLessons();
         this.setupEventListeners();
     }
 
-    async loadAvailableLessons() {
-        try {
-            const response = await fetch(`${this.apiBaseUrl}/lessons`);
-            const result = await response.json();
-            
-            if (result.success) {
-                this.allLessons = result.data;
-                
-                if (this.filterType) {
-                    await this.filterAvailableLessons();
-                } else {
-                    this.availableLessons = this.allLessons;
-                }
-                
-                this.renderLessonSelector();
-            }
-        } catch (error) {
-            console.error('Error loading lessons:', error);
+    async loadLessons() {
+        if (this.filterType) {
+            await this.loadFilteredLessons();
+        } else {
+            this.availableLessons = Array.from({length: 25}, (_, i) => i + 1);
         }
+        this.renderLessonSelector();
     }
 
-    async filterAvailableLessons() {
+    async loadFilteredLessons() {
         const lessonsWithContent = [];
         
-        for (const lessonNum of this.allLessons) {
+        for (let lessonNum = 1; lessonNum <= 25; lessonNum++) {
             try {
-                const response = await fetch(`${this.apiBaseUrl}/lessons/${lessonNum}/vocabulary`);
+                const response = await fetch(`${this.apiBaseUrl}/lessons/${lessonNum}/vocabulary/${this.filterType}`);
                 const result = await response.json();
                 
-                if (result.success && result.data) {
-                    const hasMatchingVocab = result.data.some(item => 
-                        item.category && item.category.toLowerCase() === this.filterType.toLowerCase()
-                    );
-                    
-                    if (hasMatchingVocab) {
-                        lessonsWithContent.push(lessonNum);
-                    }
+                if (result.success && result.data && result.data.length > 0) {
+                    lessonsWithContent.push(lessonNum);
                 }
             } catch (error) {
                 console.error(`Error checking lesson ${lessonNum}:`, error);

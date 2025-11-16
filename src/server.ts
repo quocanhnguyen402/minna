@@ -66,6 +66,37 @@ app.get('/api/lessons/:lessonNumber', (req: Request, res: Response) => {
     });
 });
 
+app.get('/api/lessons/:lessonNumber/vocabulary/:category', (req: Request, res: Response) => {
+    const lessonNumber = parseInt(req.params.lessonNumber);
+    const category = req.params.category;
+    
+    if (isNaN(lessonNumber) || lessonNumber < 1 || lessonNumber > 50) {
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid lesson number. Must be between 1 and 50.'
+        });
+    }
+
+    const vocabulary = lessonService.getLessonVocabulary(lessonNumber);
+    
+    if (!vocabulary) {
+        return res.status(404).json({
+            success: false,
+            error: `Lesson ${lessonNumber} vocabulary not available yet.`
+        });
+    }
+
+    const filtered = quizService.filterVocabulary(vocabulary, category);
+
+    res.json({
+        success: true,
+        data: filtered,
+        total: filtered.length,
+        lessonNumber: lessonNumber,
+        category: category
+    });
+});
+
 app.get('/api/lessons/:lessonNumber/vocabulary', (req: Request, res: Response) => {
     const lessonNumber = parseInt(req.params.lessonNumber);
     
