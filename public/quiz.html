@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Minna no Nihongo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/quiz.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Content Area -->
+        <main>
+            <!-- Quiz Header -->
+            <section class="quiz-header-modern">
+                <div class="header-content">
+                    <a href="/vocab" class="back-link-modern">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Setup
+                    </a>
+                    <h1>Vocabulary Quiz</h1>
+                    <button class="btn-end-quiz" id="endQuizBtn">End Quiz</button>
+                </div>
+            </section>
+
+            <!-- Quiz Area -->
+            <section class="quiz-area-modern" id="quizArea">
+                <!-- Quiz Progress Header -->
+                <div class="quiz-progress-header">
+                    <div class="progress-info">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">0 / 0 mastered</div>
+                    </div>
+                </div>
+
+                <!-- Flashcard Container -->
+                <div class="flashcard-container-modern">
+                    <div class="flashcard-modern" id="flashcardModern">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front-modern" id="flashcardFront">
+                                <div class="card-label">Question</div>
+                                <div class="card-content-with-speaker">
+                                    <div class="card-kanji-modern" id="cardKanji">漢字</div>
+                                    <div class="card-action-buttons">
+                                        <button class="speaker-btn" id="speakerFront" title="Listen to pronunciation">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                            </svg>
+                                        </button>
+                                        <button class="dictionary-btn" id="dictionaryFront" title="Search in dictionary">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                                <circle cx="10" cy="8" r="2"/>
+                                                <path d="m20 2-4.5 4.5"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flashcard-back-modern" id="flashcardBack">
+                                <div class="card-label">Answer</div>
+                                <div class="answer-content">
+                                    <div class="card-content-with-speaker">
+                                        <div class="card-japanese-modern" id="cardJapanese">ひらがな</div>
+                                        <div class="card-action-buttons">
+                                            <button class="speaker-btn" id="speakerBack" title="Listen to pronunciation">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                                </svg>
+                                            </button>
+                                            <button class="dictionary-btn" id="dictionaryBack" title="Search in dictionary">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                                    <circle cx="10" cy="8" r="2"/>
+                                                    <path d="m20 2-4.5 4.5"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-romaji-modern" id="cardRomaji">romaji</div>
+                                    <div class="divider-modern"></div>
+                                    <div class="card-meaning-modern" id="cardMeaning">meaning</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Answer Buttons - Always Enabled -->
+                <div class="answer-buttons-modern" id="answerButtons">
+                    <button class="btn-answer incorrect" id="incorrectBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        <span>Incorrect</span>
+                    </button>
+                    <button class="btn-answer correct" id="correctBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Correct</span>
+                    </button>
+                </div>
+
+                <!-- Completion Screen -->
+                <div class="quiz-completion-modern" id="quizCompletion" style="display: none;">
+                    <h2>Amazing Work!</h2>
+                    <p class="completion-message-modern">You've mastered all the vocabulary cards!</p>
+                    <div class="completion-stats-grid">
+                        <div class="completion-stat">
+                            <div class="completion-stat-value" id="totalCardsStat">0</div>
+                            <div class="completion-stat-label">Total Cards</div>
+                        </div>
+                        <div class="completion-stat">
+                            <div class="completion-stat-value" id="totalAttemptsStat">0</div>
+                            <div class="completion-stat-label">Total Attempts</div>
+                        </div>
+                    </div>
+                    <button class="btn-restart-modern" id="restartBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                        </svg>
+                        Back to Setup
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/vocab-quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+/* Reading Practice Styles */
+
+/* Header */
+.reading-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.back-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.reading-header h1 {
+    font-size: 2.5em;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.lesson-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+/* Main Content */
+.reading-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Lesson Selector - Consistent with main page */
+.lesson-selector-section {
+    margin-bottom: 40px;
+}
+
+.lesson-selector-section h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--black);
+    padding-bottom: 10px;
+}
+
+.lesson-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lesson-btn {
+    background-color: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    padding: 15px 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.lesson-btn:hover {
+    background-color: var(--black);
+    color: var(--white);
+}
+
+.lesson-btn.active {
+    background-color: var(--black);
+    color: var(--white);
+}
+
+/* Introduction */
+.reading-intro {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 3rem;
+    border-left: 4px solid #667eea;
+}
+
+.reading-intro h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+.reading-intro p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #555;
+}
+
+.clickable-demo {
+    background: rgba(102, 126, 234, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clickable-demo:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.05);
+}
+
+.grammar-focus {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.grammar-focus h3 {
+    color: #667eea;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.grammar-focus ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.grammar-focus li {
+    margin: 0.5rem 0;
+    color: #555;
+}
+
+/* Reading Passages */
+.reading-passages {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.passage {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.passage:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.passage-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.passage-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.difficulty {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.passage-content {
+    padding: 2rem;
+}
+
+/* Japanese Text Styling */
+.japanese-text {
+    font-family: 'Kyoukasho', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', 'Yu Gothic', sans-serif;
+    font-size: 1.4em;
+    line-height: 2;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #f5576c;
+}
+
+.japanese-text p {
+    margin: 1rem 0;
+}
+
+/* Clickable Kanji (from quiz.css) */
+.clickable-kanji {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.clickable-kanji:hover {
+    transform: scale(1.2);
+}
+
+.clickable-kanji:active {
+    transform: scale(1.3);
+}
+
+/* Translation */
+.translation {
+    background: #e8f4fd;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0284c7;
+}
+
+.translation h4 {
+    color: #0284c7;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.translation p {
+    margin: 0.5rem 0;
+    color: #1e40af;
+    line-height: 1.6;
+}
+
+/* Comprehension Questions */
+.comprehension {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+}
+
+.comprehension h2 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.questions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.question-set {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.question-set h3 {
+    color: #28a745;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.question-set ol {
+    font-family: 'Kyoukasho', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', 'Yu Gothic', sans-serif;
+    font-size: 1.1em;
+    line-height: 1.8;
+    color: #333;
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.question-set li {
+    margin: 1rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .reading-header h1 {
+        font-size: 2em;
+    }
+    
+    .reading-main {
+        padding: 0 1rem;
+    }
+    
+    .reading-intro, .passage-content, .comprehension {
+        padding: 1rem;
+    }
+    
+    .japanese-text {
+        font-size: 1.2em;
+        padding: 1rem;
+    }
+    
+    .questions {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .question-set {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .japanese-text {
+        font-size: 1.1em;
+        line-height: 1.8;
+    }
+    
+    .passage-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
