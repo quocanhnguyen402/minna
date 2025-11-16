@@ -36,7 +36,6 @@ class ReadingPractice {
             
             if (result.success) {
                 this.availableLessons = result.data;
-                console.log('Available reading lessons:', this.availableLessons);
             } else {
                 console.error('API returned error for lessons:', result.error || 'Unknown error');
                 this.availableLessons = [];
@@ -97,8 +96,6 @@ class ReadingPractice {
             
             if (result.success) {
                 this.lessonData = result.data;
-                console.log('Loaded lesson data:', this.lessonData);
-                console.log('First passage content:', this.lessonData.passages[0]?.content);
                 this.showLessonContent();
                 this.renderLessonContent();
             } else {
@@ -191,9 +188,6 @@ class ReadingPractice {
                         const japaneseText = sentence.words.map(word => word.japanese).join('');
                         const sentenceId = `sentence-${passage.id}-${sentenceIndex}`;
                         
-                        console.log('Sentence words:', sentence.words.map(w => w.japanese));
-                        console.log('Generated HTML for sentence:', wordsHtml);
-                        
                         return `
                             <div class="sentence-container">
                                 <button class="speaker-btn" onclick="readingPractice.speakSentence('${japaneseText}')" title="Listen to sentence">
@@ -270,8 +264,6 @@ class ReadingPractice {
         utterance.volume = 0.9;
 
         window.speechSynthesis.speak(utterance);
-        
-        console.log('Speaking:', text);
     }
 
 
@@ -283,11 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     readingPractice = new ReadingPractice();
 
     if ('speechSynthesis' in window) {
-
         window.speechSynthesis.getVoices();
-        window.speechSynthesis.onvoiceschanged = () => {
-            console.log('Available voices loaded:', window.speechSynthesis.getVoices().length);
-        };
     } else {
         console.warn('Speech synthesis not supported in this browser');
     }

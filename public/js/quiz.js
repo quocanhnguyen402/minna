@@ -5,7 +5,6 @@ class VocabularyQuiz {
         this.selectedWords = new Set(); // Track individually selected words
         this.quizCards = []; // Cards for current quiz with mastery tracking
         this.reviewPool = new Set(); // Cards that need review (added when answered incorrectly)
-        this.currentCardIndex = 0;
         this.masteryTarget = 3;
         this.totalAttempts = 0;
         this.isRevealed = false;
@@ -21,7 +20,6 @@ class VocabularyQuiz {
         this.speechSynthesis = window.speechSynthesis;
         this.currentUtterance = null;
         this.japaneseVoices = [];
-        this.speechReady = false;
         
         this.init();
     }
@@ -35,7 +33,6 @@ class VocabularyQuiz {
     async init() {
         await this.loadAvailableLessons();
         this.setupEventListeners();
-        this.updateQuizTitle();
         this.initializeTTS();
     }
 
@@ -53,10 +50,7 @@ class VocabularyQuiz {
                 voice.name.toLowerCase().includes('japan')
             );
             
-            if (this.japaneseVoices.length > 0) {
-                this.speechReady = true;
-                console.log('Japanese voices available:', this.japaneseVoices.length);
-            } else {
+            if (this.japaneseVoices.length === 0) {
                 console.warn('No Japanese voices found');
             }
         };
@@ -69,14 +63,6 @@ class VocabularyQuiz {
             const dummyUtterance = new SpeechSynthesisUtterance('');
             dummyUtterance.volume = 0;
             this.speechSynthesis.speak(dummyUtterance);
-        }
-    }
-
-    updateQuizTitle() {
-        if (this.filterType) {
-            const filterName = this.filterType.charAt(0).toUpperCase() + this.filterType.slice(1);
-
-
         }
     }
 
@@ -287,20 +273,6 @@ class VocabularyQuiz {
         });
     }
 
-    setupLessonPreview() {
-
-        setTimeout(() => {
-            const lessonSelector = document.getElementById('lessonSelector');
-            if (lessonSelector) {
-                lessonSelector.addEventListener('change', async (e) => {
-                    if (e.target.type === 'checkbox') {
-                        await this.updateCardPreview();
-                    }
-                });
-            }
-        }, 100);
-    }
-
     async toggleAllLessons(select) {
         const checkboxes = document.querySelectorAll('#lessonSelector input[type="checkbox"]');
         checkboxes.forEach(cb => {
@@ -457,7 +429,6 @@ class VocabularyQuiz {
         this.currentRound = 1;
         this.setupRoundCards();
         
-        this.currentCardIndex = 0;
         this.totalAttempts = 0;
         this.updateStats();
         
@@ -472,54 +443,28 @@ class VocabularyQuiz {
     }
 
     setupRoundCards() {
-        console.log(`\n========== ROUND ${this.currentRound} SETUP ==========`);
-        console.log(`Mastery Target: ${this.masteryTarget}`);
-        console.log(`Total Quiz Cards: ${this.quizCards.length}`);
-        console.log(`Review Pool Size BEFORE: ${this.reviewPool.size}`);
-        
         if (this.currentRound <= this.masteryTarget) {
-
             this.roundCards = [...this.quizCards];
             this.shuffleCards();
-            this.roundCards = [...this.quizCards]; // Copy shuffled order
-            
-            console.log(`Round Type: Regular (${this.currentRound}/${this.masteryTarget})`);
-            console.log(`Cards in this round: ${this.roundCards.length}`);
-            console.log('Cards:', this.roundCards.map(c => c.japanese).join(', '));
+            this.roundCards = [...this.quizCards];
         } else {
-
-            console.log(`Round Type: REVIEW ROUND (Round ${this.currentRound})`);
-            
             if (this.reviewPool.size === 0) {
                 this.roundCards = [];
-                console.log('Review pool is empty - Quiz will end');
-                console.log('==========================================\n');
                 return;
             }
 
             const reviewCards = this.quizCards.filter(card => this.reviewPool.has(card.id));
-            
-            console.log(`Cards in this review round: ${reviewCards.length}`);
-            reviewCards.forEach(card => {
-                console.log(`  - ${card.japanese}: correct in ${card.correctInRounds.size}/${this.masteryTarget} rounds, incorrect count: ${card.incorrectCount}`);
-            });
-
             this.reviewPool.clear();
-            console.log('Review pool CLEARED - will be rebuilt based on this round\'s incorrect answers');
-            
             this.roundCards = reviewCards;
 
             for (let i = this.roundCards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [this.roundCards[i], this.roundCards[j]] = [this.roundCards[j], this.roundCards[i]];
             }
-            
-            console.log('Review round cards (shuffled):', this.roundCards.map(c => c.japanese).join(', '));
         }
         
         this.roundCardIndex = 0;
         this.shownInRound = new Set();
-        console.log('==========================================\n');
     }
 
     getNextCard() {
@@ -686,8 +631,6 @@ class VocabularyQuiz {
             }
 
             this.reviewPool.add(this.currentCard.id);
-            console.log(`✗ ${this.currentCard.japanese} added to review pool (size now: ${this.reviewPool.size})`);
-
             this.currentCard.correctCount = 0;
         }
 
@@ -807,12 +750,7 @@ class VocabularyQuiz {
 
         speakerBtn.classList.add('speaking');
 
-        this.currentUtterance.onstart = () => {
-            console.log('Speech started');
-        };
-
         this.currentUtterance.onend = () => {
-            console.log('Speech ended');
             this.removeSpeakingAnimation();
             this.currentUtterance = null;
         };
@@ -835,12 +773,6 @@ class VocabularyQuiz {
         };
 
         try {
-
-            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-
-                console.log('Mobile device detected, ensuring user interaction');
-            }
-            
             this.speechSynthesis.speak(this.currentUtterance);
 
             setTimeout(() => {

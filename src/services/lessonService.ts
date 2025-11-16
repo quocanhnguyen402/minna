@@ -1,6 +1,6 @@
 import { LessonData } from '../types/lesson.types';
 
-import { vocabularyData, grammarData } from '../../data';
+import { vocabularyData, grammarData, lessonsInfo } from '../../data';
 
 class LessonService {
     private lessons: Map<number, LessonData> = new Map();
@@ -41,6 +41,10 @@ class LessonService {
     public getLessonGrammar(lessonNumber: number) {
         const lesson = this.lessons.get(lessonNumber);
         return lesson ? lesson.grammar : null;
+    }
+
+    public getLessonsInfo() {
+        return lessonsInfo;
     }
 }
 

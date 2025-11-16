@@ -6,8 +6,6 @@ class VocabularySetup {
         this.apiBaseUrl = '/api';
         this.filterType = this.getFilterFromUrl();
         this.availableLessons = [];
-
-
         
         this.init();
     }
@@ -33,22 +31,27 @@ class VocabularySetup {
     }
 
     async loadFilteredLessons() {
-        const lessonsWithContent = [];
+        const checkPromises = [];
         
         for (let lessonNum = 1; lessonNum <= 25; lessonNum++) {
-            try {
-                const response = await fetch(`${this.apiBaseUrl}/lessons/${lessonNum}/vocabulary/${this.filterType}`);
-                const result = await response.json();
-                
-                if (result.success && result.data && result.data.length > 0) {
-                    lessonsWithContent.push(lessonNum);
-                }
-            } catch (error) {
-                console.error(`Error checking lesson ${lessonNum}:`, error);
-            }
+            checkPromises.push(
+                fetch(`${this.apiBaseUrl}/lessons/${lessonNum}/vocabulary/${this.filterType}`)
+                    .then(response => response.json())
+                    .then(result => ({
+                        lessonNum,
+                        hasContent: result.success && result.data && result.data.length > 0
+                    }))
+                    .catch(error => {
+                        console.error(`Error checking lesson ${lessonNum}:`, error);
+                        return { lessonNum, hasContent: false };
+                    })
+            );
         }
         
-        this.availableLessons = lessonsWithContent;
+        const results = await Promise.all(checkPromises);
+        this.availableLessons = results
+            .filter(r => r.hasContent)
+            .map(r => r.lessonNum);
     }
 
     renderLessonSelector() {
@@ -78,8 +81,6 @@ class VocabularySetup {
             });
 
             checkboxDiv.addEventListener('click', (e) => {
-
-
                 if (e.target !== checkbox && e.target !== label) {
                     checkbox.checked = !checkbox.checked;
                     checkbox.dispatchEvent(new Event('change'));

@@ -9,12 +9,7 @@ class ReadingService {
 
     private loadLessons() {
         try {
-
-
             const lesson8 = require('../../data/lesson8/reading').lesson8Reading;
-            console.log('Loaded lesson 8 data:', lesson8);
-            console.log('First passage:', lesson8?.passages?.[0]);
-            console.log('First passage content:', lesson8?.passages?.[0]?.content);
             this.lessons.set(8, lesson8);
         } catch (error) {
             console.error('Error loading reading lessons:', error);

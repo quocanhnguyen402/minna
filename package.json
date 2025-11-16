@@ -6,7 +6,8 @@
     "build": "tsc",
     "start": "node dist/src/server.js",
     "dev": "ts-node src/server.ts",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "deploy": "vercel --prod"
   },
   "keywords": [
     "japanese",
