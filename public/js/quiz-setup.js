@@ -21,37 +21,36 @@ class VocabularySetup {
         this.setupEventListeners();
     }
 
-    async loadLessons() {
-        if (this.filterType) {
-            await this.loadFilteredLessons();
-        } else {
-            this.availableLessons = Array.from({length: 25}, (_, i) => i + 1);
-        }
-        this.renderLessonSelector();
+    getSessionStorageKey(lessonNumber) {
+        return this.filterType ? `lessonVocabCache${lessonNumber}_${this.filterType}` : `lessonVocabCache${lessonNumber}_all`;
     }
 
-    async loadFilteredLessons() {
-        const checkPromises = [];
-        
-        for (let lessonNum = 1; lessonNum <= 25; lessonNum++) {
-            checkPromises.push(
-                fetch(`${this.apiBaseUrl}/lessons/${lessonNum}/vocabulary/${this.filterType}`)
-                    .then(response => response.json())
-                    .then(result => ({
-                        lessonNum,
-                        hasContent: result.success && result.data && result.data.length > 0
-                    }))
-                    .catch(error => {
-                        console.error(`Error checking lesson ${lessonNum}:`, error);
-                        return { lessonNum, hasContent: false };
-                    })
-            );
+    async fetchLessonInfo(endpoint) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/lessons/info${endpoint}`);
+            const result = await response.json();
+            return result.success ? result.data : [];
+        } catch (error) {
+            console.error('Error loading lesson info:', error);
+            return [];
         }
-        
-        const results = await Promise.all(checkPromises);
-        this.availableLessons = results
-            .filter(r => r.hasContent)
-            .map(r => r.lessonNum);
+    }
+
+    async loadLessons() {
+        if (this.filterType) {
+            const data = await this.fetchLessonInfo(`/${this.filterType}`);
+            this.availableLessons = data.map(item => ({
+                lessonNumber: item.lessonNumber,
+                count: item.count
+            }));
+        } else {
+            const data = await this.fetchLessonInfo('');
+            this.availableLessons = data.map(item => ({
+                lessonNumber: item.lessonNumber,
+                count: item.vocabularyCount
+            }));
+        }
+        this.renderLessonSelector();
     }
 
     renderLessonSelector() {
@@ -59,12 +58,12 @@ class VocabularySetup {
         if (!container) return;
         container.innerHTML = '';
 
-        this.availableLessons.forEach(lessonNum => {
+        this.availableLessons.forEach(lesson => {
             const checkboxDiv = document.createElement('div');
             checkboxDiv.className = 'lesson-checkbox-modern';
             checkboxDiv.innerHTML = `
-                <input type="checkbox" id="lesson${lessonNum}" value="${lessonNum}">
-                <label for="lesson${lessonNum}">${lessonNum}</label>
+                <input type="checkbox" id="lesson${lesson.lessonNumber}" value="${lesson.lessonNumber}">
+                <label for="lesson${lesson.lessonNumber}">${lesson.lessonNumber}</label>
             `;
             
             const checkbox = checkboxDiv.querySelector('input');
@@ -200,7 +199,8 @@ class VocabularySetup {
     getCurrentLesson() {
         const checkboxes = document.querySelectorAll('#lessonSelector input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
-            return Math.max(...this.availableLessons);
+            return this.availableLessons.length > 0 ? 
+                Math.max(...this.availableLessons.map(l => l.lessonNumber)) : 1;
         }
         
         const selectedLessons = Array.from(checkboxes).map(cb => parseInt(cb.value));
@@ -240,31 +240,55 @@ class VocabularySetup {
     }
 
     async loadVocabulary(lessonNumbers) {
-        try {
-            const lessonParam = lessonNumbers.join(',');
-            let url = `${this.apiBaseUrl}/vocab/lessons?lessons=${lessonParam}`;
+        this.vocabularyPool = [];
+        
+        for (const lessonNum of lessonNumbers) {
+            const sessionKey = this.getSessionStorageKey(lessonNum);
+            const cached = sessionStorage.getItem(sessionKey);
             
+            if (cached) {
+                try {
+                    const vocabData = JSON.parse(cached);
+                    this.vocabularyPool.push(...vocabData);
+                } catch (error) {
+                    console.error(`Error parsing cache for lesson ${lessonNum}:`, error);
+                    const vocabData = await this.fetchLessonVocabulary(lessonNum);
+                    if (vocabData && vocabData.length > 0) {
+                        sessionStorage.setItem(sessionKey, JSON.stringify(vocabData));
+                        this.vocabularyPool.push(...vocabData);
+                    }
+                }
+            } else {
+                const vocabData = await this.fetchLessonVocabulary(lessonNum);
+                if (vocabData && vocabData.length > 0) {
+                    sessionStorage.setItem(sessionKey, JSON.stringify(vocabData));
+                    this.vocabularyPool.push(...vocabData);
+                }
+            }
+        }
+    }
+
+    async fetchLessonVocabulary(lessonNumber) {
+        try {
+            let url;
             if (this.filterType) {
-                url += `&filter=${this.filterType}`;
+                url = `${this.apiBaseUrl}/lessons/${lessonNumber}/vocabulary/${this.filterType}`;
+            } else {
+                url = `${this.apiBaseUrl}/lessons/${lessonNumber}/vocabulary`;
             }
             
             const response = await fetch(url);
             const result = await response.json();
             
-            if (result.success) {
-                this.vocabularyPool = result.data;
-            }
+            return result.success ? result.data : [];
         } catch (error) {
-            console.error('Error loading vocabulary:', error);
-            this.vocabularyPool = [];
+            console.error(`Error loading vocabulary for lesson ${lessonNumber}:`, error);
+            return [];
         }
     }
 
     cleanJapaneseText(text) {
         if (!text) return text;
-
-
-
         return text
             .replace(/[「『][^」』]*[」』].*$/, '') // Japanese brackets
             .replace(/\[[^\]]*\]/g, '') // Square brackets

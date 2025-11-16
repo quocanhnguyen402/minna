@@ -483,10 +483,12 @@
     transition: transform 0.6s;
     transform-style: preserve-3d;
     border: 3px solid var(--black);
+    -webkit-transform-style: preserve-3d;
 }
 
 .flashcard-modern.flipped .flashcard-inner {
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 }
 
 .flashcard-front-modern,
@@ -513,10 +515,12 @@
 .flashcard-front-modern {
     z-index: 2;
     transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
 }
 
 .flashcard-back-modern {
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 }
 
 .card-label {
@@ -803,10 +807,12 @@
     transition: transform 0.6s;
     transform-style: preserve-3d;
     border: 2px solid var(--black);
+    -webkit-transform-style: preserve-3d;
 }
 
 .preview-card.flipped .preview-card-inner {
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 }
 
 .preview-card-front,
@@ -834,10 +840,12 @@
 .preview-card-front {
     z-index: 2;
     transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
 }
 
 .preview-card-back {
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 }
 
 .preview-kanji {
@@ -940,14 +948,44 @@
 
 /* Responsive Modern Quiz */
 @media (max-width: 768px) {
+    .quiz-header-modern {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
     .quiz-header-modern h1 {
-        font-size: 2em;
+        font-size: 1.5em;
+        margin: 10px 0;
+    }
+
+    .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .back-link-modern {
         position: static;
         transform: none;
-        margin-bottom: 20px;
+        align-self: flex-start;
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .btn-end-quiz {
+        position: static;
+        transform: none;
+        align-self: flex-end;
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+
+    .quiz-progress-header {
+        padding: 15px;
+    }
+
+    .progress-text {
+        font-size: 0.9em;
     }
 
     .setup-container {
@@ -976,12 +1014,29 @@
         gap: 12px;
     }
 
+    .flashcard-container-modern {
+        padding: 15px;
+    }
+
+    .flashcard-modern {
+        min-height: 350px;
+        max-height: 450px;
+    }
+
     .card-kanji-modern {
-        font-size: 4em;
+        font-size: 3em;
     }
 
     .card-japanese-modern {
-        font-size: 2.5em;
+        font-size: 2em;
+    }
+
+    .card-romaji-modern {
+        font-size: 1em;
+    }
+
+    .card-meaning-modern {
+        font-size: 1em;
     }
 
     .card-content-with-speaker {
@@ -1002,12 +1057,18 @@
 
     .answer-buttons-modern {
         grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .btn-answer {
+        padding: 18px;
+        font-size: 1.1em;
     }
 
     .completion-stats-grid {
         grid-template-columns: 1fr;
     }
-}
 
     /* Card Preview Responsive */
     .card-preview-grid {

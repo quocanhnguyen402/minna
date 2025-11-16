@@ -31,9 +31,46 @@ class VocabularyQuiz {
     }
 
     async init() {
-        await this.loadAvailableLessons();
-        this.setupEventListeners();
         this.initializeTTS();
+        
+        const quizData = sessionStorage.getItem('quizData');
+        if (quizData) {
+            try {
+                const data = JSON.parse(quizData);
+                this.vocabularyPool = data.vocabulary || [];
+                this.masteryTarget = data.masteryTarget || 3;
+                this.returnUrl = data.returnUrl || '/vocab';
+                
+                if (this.vocabularyPool.length > 0) {
+                    this.startQuizDirectly();
+                } else {
+                    alert('No vocabulary data found. Redirecting to setup...');
+                    window.location.href = this.returnUrl;
+                }
+            } catch (error) {
+                console.error('Error loading quiz data:', error);
+                alert('Failed to load quiz data. Redirecting to setup...');
+                window.location.href = '/vocab';
+            }
+        } else {
+            alert('No quiz data found. Please setup your quiz first.');
+            window.location.href = '/vocab';
+        }
+        
+        this.setupEventListeners();
+    }
+
+    startQuizDirectly() {
+        const backLink = document.getElementById('backToSetupLink');
+        if (backLink) {
+            backLink.href = this.returnUrl;
+        }
+        
+        this.initializeQuizCards();
+        document.getElementById('quizArea').style.display = 'block';
+        document.getElementById('endQuizBtn').style.display = 'block';
+        document.getElementById('answerButtons').style.display = 'flex';
+        this.showNextCard();
     }
 
     initializeTTS() {
@@ -213,56 +250,86 @@ class VocabularyQuiz {
             }
         });
 
-        document.getElementById('startQuizBtn').addEventListener('click', () => {
-            this.startQuiz();
-        });
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        if (startQuizBtn) {
+            startQuizBtn.addEventListener('click', () => {
+                this.startQuiz();
+            });
+        }
 
-        document.getElementById('flashcardModern').addEventListener('click', (e) => {
+        const flashcardModern = document.getElementById('flashcardModern');
+        if (flashcardModern) {
+            flashcardModern.addEventListener('click', (e) => {
 
-            if (e.target.classList.contains('clickable-kanji')) {
+                if (e.target.classList.contains('clickable-kanji')) {
+                    e.stopPropagation(); // Prevent card flip
+                    const kanji = e.target.getAttribute('data-kanji');
+                    this.searchKanji(kanji);
+                    return;
+                }
+                this.flipCard();
+            });
+        }
+
+        const correctBtn = document.getElementById('correctBtn');
+        if (correctBtn) {
+            correctBtn.addEventListener('click', () => {
+                this.handleAnswer(true);
+            });
+        }
+
+        const incorrectBtn = document.getElementById('incorrectBtn');
+        if (incorrectBtn) {
+            incorrectBtn.addEventListener('click', () => {
+                this.handleAnswer(false);
+            });
+        }
+
+        const restartBtn = document.getElementById('restartBtn');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                this.resetQuiz();
+            });
+        }
+
+        const endQuizBtn = document.getElementById('endQuizBtn');
+        if (endQuizBtn) {
+            endQuizBtn.addEventListener('click', () => {
+                this.endQuiz();
+            });
+        }
+
+        const speakerFront = document.getElementById('speakerFront');
+        if (speakerFront) {
+            speakerFront.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent card flip
-                const kanji = e.target.getAttribute('data-kanji');
-                this.searchKanji(kanji);
-                return;
-            }
-            this.flipCard();
-        });
+                this.speakJapanese('front');
+            });
+        }
 
-        document.getElementById('correctBtn').addEventListener('click', () => {
-            this.handleAnswer(true);
-        });
+        const speakerBack = document.getElementById('speakerBack');
+        if (speakerBack) {
+            speakerBack.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card flip
+                this.speakJapanese('back');
+            });
+        }
 
-        document.getElementById('incorrectBtn').addEventListener('click', () => {
-            this.handleAnswer(false);
-        });
+        const dictionaryFront = document.getElementById('dictionaryFront');
+        if (dictionaryFront) {
+            dictionaryFront.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card flip
+                this.openDictionary();
+            });
+        }
 
-        document.getElementById('restartBtn').addEventListener('click', () => {
-            this.resetQuiz();
-        });
-
-        document.getElementById('endQuizBtn').addEventListener('click', () => {
-            this.endQuiz();
-        });
-
-        document.getElementById('speakerFront').addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent card flip
-            this.speakJapanese('front');
-        });
-
-        document.getElementById('speakerBack').addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent card flip
-            this.speakJapanese('back');
-        });
-
-        document.getElementById('dictionaryFront').addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent card flip
-            this.openDictionary();
-        });
-
-        document.getElementById('dictionaryBack').addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent card flip
-            this.openDictionary();
-        });
+        const dictionaryBack = document.getElementById('dictionaryBack');
+        if (dictionaryBack) {
+            dictionaryBack.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card flip
+                this.openDictionary();
+            });
+        }
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('clickable-kanji')) {
@@ -676,29 +743,13 @@ class VocabularyQuiz {
     }
 
     resetQuiz() {
-
         this.stopSpeech();
-        
-        document.getElementById('quizArea').style.display = 'none';
-        document.getElementById('quizSetup').style.display = 'block';
-        document.getElementById('endQuizBtn').style.display = 'none';
-
-        this.vocabularyPool = [];
-        this.quizCards = [];
-        this.currentCard = null;
-        this.totalAttempts = 0;
-        this.currentRound = 1;
-        this.roundCards = [];
-        this.roundCardIndex = 0;
-        this.shownInRound = new Set();
-
-        document.querySelector('.flashcard-container-modern').style.display = 'block';
-        document.getElementById('quizCompletion').style.display = 'none';
-        document.querySelector('.quiz-progress-header').style.display = 'block';
+        sessionStorage.removeItem('quizData');
+        window.location.href = this.returnUrl || '/vocab';
     }
 
     endQuiz() {
-      this.resetQuiz();
+        this.resetQuiz();
     }
 
     speakJapanese(side) {
@@ -709,10 +760,8 @@ class VocabularyQuiz {
             return;
         }
 
-        if (this.currentUtterance) {
-            this.speechSynthesis.cancel();
-            this.removeSpeakingAnimation();
-        }
+        this.speechSynthesis.cancel();
+        this.removeSpeakingAnimation();
 
         const textToSpeak = this.cleanJapaneseText(this.currentCard.japanese);
         
@@ -721,77 +770,84 @@ class VocabularyQuiz {
             return;
         }
 
-        this.currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+        setTimeout(() => {
+            this.currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
 
-        this.currentUtterance.lang = 'ja-JP';
+            this.currentUtterance.lang = 'ja-JP';
 
-        if (this.japaneseVoices.length > 0) {
-
-            const femaleVoice = this.japaneseVoices.find(v => 
-                v.name.toLowerCase().includes('female') || 
-                v.name.toLowerCase().includes('woman') ||
-                !v.name.toLowerCase().includes('male')
-            );
-            this.currentUtterance.voice = femaleVoice || this.japaneseVoices[0];
-        }
-
-        this.currentUtterance.rate = 1.0; // Normal speed
-        this.currentUtterance.pitch = 1.0;
-        this.currentUtterance.volume = 1.0;
-
-        const speakerBtn = side === 'front' ? 
-            document.getElementById('speakerFront') : 
-            document.getElementById('speakerBack');
-
-        if (!speakerBtn) {
-            console.warn('Speaker button not found');
-            return;
-        }
-
-        speakerBtn.classList.add('speaking');
-
-        this.currentUtterance.onend = () => {
-            this.removeSpeakingAnimation();
-            this.currentUtterance = null;
-        };
-
-        this.currentUtterance.onerror = (event) => {
-            console.warn('Speech synthesis error:', event.error, event);
-            this.removeSpeakingAnimation();
-            this.currentUtterance = null;
-
-            let message = 'Speech synthesis failed';
-            if (event.error === 'not-allowed') {
-                message = 'Speech blocked. Try tapping the speaker button again.';
-            } else if (event.error === 'network') {
-                message = 'Network error. Check internet connection.';
-            } else if (event.error === 'synthesis-failed') {
-                message = 'Speech synthesis failed. Try again.';
+            if (this.japaneseVoices.length > 0) {
+                const femaleVoice = this.japaneseVoices.find(v => 
+                    v.name.toLowerCase().includes('female') || 
+                    v.name.toLowerCase().includes('woman') ||
+                    !v.name.toLowerCase().includes('male')
+                );
+                this.currentUtterance.voice = femaleVoice || this.japaneseVoices[0];
             }
-            
-            this.showSpeechNotSupported(message);
-        };
 
-        try {
-            this.speechSynthesis.speak(this.currentUtterance);
+            this.currentUtterance.rate = 0.9;
+            this.currentUtterance.pitch = 1.0;
+            this.currentUtterance.volume = 1.0;
 
-            setTimeout(() => {
-                if (this.currentUtterance && !this.speechSynthesis.speaking) {
-                    console.warn('Speech may have failed to start');
-                    this.removeSpeakingAnimation();
+            const speakerBtn = side === 'front' ? 
+                document.getElementById('speakerFront') : 
+                document.getElementById('speakerBack');
+
+            if (!speakerBtn) {
+                console.warn('Speaker button not found');
+                return;
+            }
+
+            speakerBtn.classList.add('speaking');
+
+            this.currentUtterance.onstart = () => {
+                console.log('Speech started');
+            };
+
+            this.currentUtterance.onend = () => {
+                this.removeSpeakingAnimation();
+                this.currentUtterance = null;
+            };
+
+            this.currentUtterance.onerror = (event) => {
+                console.warn('Speech synthesis error:', event.error, event);
+                this.removeSpeakingAnimation();
+                this.currentUtterance = null;
+
+                let message = 'Speech synthesis failed';
+                if (event.error === 'not-allowed') {
+                    message = 'Speech blocked. Please allow audio in your browser settings.';
+                } else if (event.error === 'network') {
+                    message = 'Network error. Check internet connection.';
+                } else if (event.error === 'synthesis-failed') {
+                    message = 'Speech synthesis failed. Try again.';
+                } else if (event.error === 'audio-busy') {
+                    message = 'Audio is busy. Please wait and try again.';
                 }
-            }, 1000);
-            
-        } catch (error) {
-            console.warn('Speech synthesis not supported:', error);
-            this.removeSpeakingAnimation();
-            this.showSpeechNotSupported('Browser does not support speech synthesis');
-        }
+                
+                this.showSpeechNotSupported(message);
+            };
+
+            try {
+                this.speechSynthesis.speak(this.currentUtterance);
+
+                setTimeout(() => {
+                    if (this.currentUtterance && !this.speechSynthesis.speaking) {
+                        console.warn('Speech may have failed to start - retrying');
+                        this.speechSynthesis.speak(this.currentUtterance);
+                    }
+                }, 200);
+                
+            } catch (error) {
+                console.error('Error speaking:', error);
+                this.removeSpeakingAnimation();
+                this.showSpeechNotSupported('Failed to start speech: ' + error.message);
+            }
+        }, 100);
     }
 
     removeSpeakingAnimation() {
-        document.getElementById('speakerFront').classList.remove('speaking');
-        document.getElementById('speakerBack').classList.remove('speaking');
+        document.getElementById('speakerFront')?.classList.remove('speaking');
+        document.getElementById('speakerBack')?.classList.remove('speaking');
     }
 
     showSpeechNotSupported(message = 'Speech synthesis not supported in this browser') {
